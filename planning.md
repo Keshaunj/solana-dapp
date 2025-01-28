@@ -38,7 +38,9 @@ This project involves creating a decentralized application (dApp) that allows us
 
 4. **UI Enhancements**:
    - Add animations and responsive design for a better user experience.
-
+5. Input Search  
+- As a user, I want the ability to **search for other tokens**.  
+- As a user, I want to see **price changes for Solana and other tokens**.  
 ---
 
 ## Technical Stack
@@ -69,7 +71,8 @@ project-root/
 │       └── components/
 │       └── App.jsx
 │   └── package.json
-└── README.md
+|    
+└── README.md , .env , gitignore
 ```
 
 ---
@@ -128,6 +131,37 @@ project-root/
 - Optional: Add stretch goal features.
 
 ---
+# User Stories  
+
+## Authentication  
+- As a user, I want to **sign up or log in** to my account so I can access my Solana wallet profile securely.  
+- As a returning user, I want to **log in quickly** and be directed to my personalized Solana wallet dashboard.  
+
+## Wallet Management  
+- As a user, I want to **create or import a Solana wallet** to manage my funds within the dApp.  
+- As a user, I want my wallet data to be **securely stored and accessible in the database**.  
+
+## Buy Solana  
+- As a user, I want to be directed to a **trusted third-party platform** (e.g., Phantom or Solflare) to buy Solana tokens.  
+
+## Sell Solana  
+- As a user, I want to **sell Solana directly** from my wallet and see the transaction logged in my profile.  
+
+## Send Solana  
+- As a user, I want to **send Solana** to another wallet by entering the recipient's wallet address.  
+- As a user, I want my **sent transactions to be stored and viewable** in my profile.  
+
+## Receive Solana  
+- As a user, I want to **receive Solana** by sharing my wallet address and have the incoming transactions reflected in my account balance.  
+
+## User Profile  
+- As a user, I want my **Solana wallet profile and transaction history** to be stored in a secure PostgreSQL database so that I can access my data at any time.  
+- As a user, I want to be able to **view my transaction logs** for Buy, Sell, Send, and Receive actions.  
+
+## Input Search  
+- As a user, I want the ability to **search for other tokens**.  
+- As a user, I want to see **price changes for Solana and other tokens**.  
+
 
 ## Deployment Plan
 1. **Backend**:
