@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-
+import authRoutes from "./routes/authRoutes.js";
 
 
 dotenv.config();
@@ -36,6 +36,7 @@ mongoose
     console.error("MongoDB connection error:", err);
   });
 
+  app.use("/auth", authRoutes);
 
 // Start the server
 const PORT = process.env.PORT || 3000;

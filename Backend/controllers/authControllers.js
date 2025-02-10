@@ -2,7 +2,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "./models/userModel";
-import jwt from "jsonwebtoken";
 import { body, validationResult } from "express-validator";
 
 const authenticateToken = (req, res, next) => {
@@ -62,9 +61,6 @@ app.get("/", (req, res) => {
       }
     }
   );
-  app.get("/dashboard", authenticateToken, (req, res) => {
-    res.json({ message: `Welcome to your dashboard, ${req.user.username}!` });
-  });
 
 
   
