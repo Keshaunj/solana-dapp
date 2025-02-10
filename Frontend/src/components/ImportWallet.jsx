@@ -86,7 +86,7 @@ const ImportWallet = () => {
       {!walletAddress ? (
         <div className="flex flex-col gap-4">
           <label className="block text-gray-700">
-            Enter Private Key (64-character hex string):
+            Enter Private Key (128-character hex string):
           </label>
           <input
             type="text"
