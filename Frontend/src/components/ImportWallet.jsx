@@ -7,7 +7,7 @@ const ImportWallet = () => {
   const [balance, setBalance] = useState(null);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [network, setNetwork] = useState('devnet'); // Default to Devnet
+  const [network, setNetwork] = useState('mainet'); // Default to Devnet
 
   // Alchemy RPC URLs
   const ALCHEMY_API_KEY = import.meta.env.VITE_ALCHEMY_API_KEY;
