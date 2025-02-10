@@ -3,6 +3,8 @@ import WalletGenerator from "./WalletGenerator";
 import ImportWallet from "./ImportWallet";
 import { Connection, PublicKey, LAMPORTS_PER_SOL, clusterApiUrl } from "@solana/web3.js";
 
+
+
 const Dashboard = () => {
   const [publicKeyInput, setPublicKeyInput] = useState("");
   const [balance, setBalance] = useState(null);

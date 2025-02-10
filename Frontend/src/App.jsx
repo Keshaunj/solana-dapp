@@ -1,13 +1,20 @@
-// App.jsx
-import { useState, useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import Dashboard from './components/Dashboard'
-import SignIn from './components/Signin'
-import Signup from './components/Signup'
+import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Dashboard from './components/Dashboard';
+import SignIn from './components/Signin';
+import Signup from './components/Signup';
+import ImportWallet from './components/ImportWallet';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [showSignup, setShowSignup] = useState(false);
+
+  useEffect(() => {
+    // Check for authentication token on mount
+    const token = localStorage.getItem('token');
+    if (token) {
+      setIsAuthenticated(true);
+    }
+  }, []);
 
   const DashboardLayout = () => (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -34,26 +41,43 @@ function App() {
     </div>
   );
 
+  // Protected Route Component
+  const ProtectedRoute = ({ children }) => {
+    return isAuthenticated ? children : <Navigate to="/signin" />;
+  };
+
   return (
     <Router>
       <Routes>
-        <Route path="/dashboard" element={<DashboardLayout />} />
-        <Route path="/" element={
+        {/* Public Routes */}
+        <Route path="/signin" element={
           !isAuthenticated ? (
-            <div>
-              {showSignup ? (
-                <Signup />
-              ) : (
-                <SignIn />
-              )}
-            </div>
+            <SignIn onSignInSuccess={() => setIsAuthenticated(true)} />
           ) : (
-            <DashboardLayout />
+            <Navigate to="/dashboard" />
           )
         } />
+        
+        <Route path="/signup" element={
+          !isAuthenticated ? (
+            <Signup onSignupSuccess={() => setIsAuthenticated(true)} />
+          ) : (
+            <Navigate to="/dashboard" />
+          )
+        } />
+
+        {/* Protected Routes */}
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        } />
+
+        {/* Default Route */}
+        <Route path="/" element={<Navigate to="/signin" />} />
       </Routes>
     </Router>
   );
 }
 
-export default App
+export default App;
