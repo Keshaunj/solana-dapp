@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Keypair, Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { Keypair } from '@solana/web3.js';
 
 const ImportWallet = () => {
   const [privateKey, setPrivateKey] = useState('');
@@ -7,69 +7,61 @@ const ImportWallet = () => {
   const [balance, setBalance] = useState(null);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [network, setNetwork] = useState('mainet'); // Default to Devnet
 
-  // Alchemy RPC URLs
-  const ALCHEMY_API_KEY = import.meta.env.VITE_ALCHEMY_API_KEY;
-  const ALCHEMY_RPC_URLS = {
-     mainnet: `https://solana-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
-  };
-
+  // Remove network state since we're only using mainnet
+  
   const handleImportWallet = () => {
     try {
-      // Validate private key input
       if (!privateKey || privateKey.length !== 128) {
         setError('Invalid private key. It must be a 128-character hex string.');
         return;
       }
-  
-      // Convert private key hex string to Uint8Array
+
       const privateKeyBytes = new Uint8Array(
         privateKey.match(/.{1,2}/g).map((byte) => parseInt(byte, 16))
       );
-  
-      // Generate Keypair from private key
+
       const keypair = Keypair.fromSecretKey(privateKeyBytes);
-  
-      // Set wallet address
       setWalletAddress(keypair.publicKey.toString());
       setError('');
-      setBalance(null); // Reset balance when importing a new wallet
+      setBalance(null);
     } catch (err) {
       setError('Failed to import wallet. Please check the private key and try again.');
       console.error(err);
     }
   };
-  
 
   const checkBalance = async () => {
     if (!walletAddress) {
-      setError('No wallet address found. Please import a wallet first.');
+      setError("Please import a wallet first.");
       return;
     }
-
+  
     setIsLoading(true);
-    setError('');
-
+    setError(""); 
+    setBalance(null); 
+  
     try {
-      // Create a connection to the selected network using Alchemy's RPC URL
-      const connection = new Connection(
-        ALCHEMY_RPC_URLS[network],
-        'confirmed'
-      );
-
-      // Convert wallet address to PublicKey
-      const publicKey = new PublicKey(walletAddress);
-
-      // Fetch balance
-      const balanceInLamports = await connection.getBalance(publicKey);
-      const balanceInSOL = balanceInLamports / LAMPORTS_PER_SOL;
-
-      // Set balance
-      setBalance(balanceInSOL);
-    } catch (err) {
-      setError('Failed to fetch balance. Please try again.');
-      console.error(err);
+      const response = await fetch('/auth/check-balance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          walletAddress: walletAddress
+        }),
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        setError(errorData.error || "Error fetching balance. Please try again.");
+      } else {
+        const data = await response.json();
+        setBalance(data.balance);
+      }
+    } catch (error) {
+      console.error("Error checking balance:", error);
+      setError("Error fetching balance. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -108,22 +100,6 @@ const ImportWallet = () => {
             Wallet Address: {walletAddress}
           </p>
 
-          {/* Network Selection */}
-          <div className="flex flex-col gap-2">
-            <label className="block text-gray-700">
-              Network
-            </label>
-            <select
-              value={network}
-              onChange={(e) => setNetwork(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
-            >
-              <option value="devnet">Devnet</option>
-              <option value="mainnet">Mainnet</option>
-            </select>
-          </div>
-
-          {/* Check Balance Button */}
           <button
             onClick={checkBalance}
             disabled={isLoading}
@@ -136,15 +112,13 @@ const ImportWallet = () => {
             {isLoading ? 'Checking Balance...' : 'Check Balance'}
           </button>
 
-          {/* Display Balance */}
           {balance !== null && (
             <div className="p-4 bg-green-100 text-green-700 rounded-lg">
               <p>Balance: {balance.toFixed(4)} SOL</p>
-              <p className="text-sm">Network: {network}</p>
+              <p className="text-sm">Network: Mainnet</p>
             </div>
           )}
 
-          {/* Clear Wallet Button */}
           <button
             onClick={() => {
               setWalletAddress(null);
@@ -153,7 +127,7 @@ const ImportWallet = () => {
             }}
             className="w-full py-2 px-4 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
           >
-            Clear Wallet
+            Delete Wallet
           </button>
         </div>
       )}
