@@ -13,7 +13,10 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', // Allow frontend from localhost:5173
+}));
+
 app.use(express.json());
 app.use(helmet()); // Set security headers
 
