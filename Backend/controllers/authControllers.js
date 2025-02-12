@@ -2,10 +2,9 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js';
 import { validationResult } from 'express-validator';
-import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
 
 // Authentication Functions
-
 const authenticateToken = (req, res, next) => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
 
@@ -24,7 +23,6 @@ const authenticateToken = (req, res, next) => {
 };
 
 // User Registration and Login
-
 const signup = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -55,9 +53,7 @@ const login = async (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
-      return res
-        .status(400)
-        .json({ message: 'Username and password are required' });
+      return res.status(400).json({ message: 'Username and password are required' });
     }
 
     const existingUser = await User.findOne({ username });
@@ -84,35 +80,83 @@ const login = async (req, res) => {
 };
 
 const logout = (req, res) => {
-  res.json({ message: 'Logged out successfully' }); // No action needed for now
+  res.json({ message: 'Logged out successfully' });
 };
 
+// Solana Wallet Functions
 const checkBalance = async (req, res) => {
-    const { walletAddress } = req.body;
+  const { walletAddress } = req.body;
     
-    if (!walletAddress) {
-      return res.status(400).json({ error: 'Wallet address is required.' });
-    }
-  
-    try {
-      const connection = new Connection(
-        'https://api.mainnet-beta.solana.com',
-        'confirmed'
-      );
-  
-      const publicKey = new PublicKey(walletAddress);
-      const balance = await connection.getBalance(publicKey);
-      const balanceInSOL = balance / LAMPORTS_PER_SOL;
+  if (!walletAddress) {
+    return res.status(400).json({ error: 'Wallet address is required.' });
+  }
+
+  try {
+    const connection = new Connection(
+      'https://api.mainnet-beta.solana.com',
+      'confirmed'
+    );
+
+    const publicKey = new PublicKey(walletAddress);
+    const balance = await connection.getBalance(publicKey);
+    const balanceInSOL = balance / LAMPORTS_PER_SOL;
       
-      return res.json({ 
-        balance: Number(balanceInSOL.toFixed(4))  // Formatted to 4 decimal places
-      });
-    } catch (error) {
-      console.error('Balance check error:', error);
-      return res.status(500).json({ error: 'Failed to fetch balance. Please try again later.' });
-    }
-  };
+    return res.json({ 
+      balance: Number(balanceInSOL.toFixed(4))
+    });
+  } catch (error) {
+    console.error('Balance check error:', error);
+    return res.status(500).json({ error: 'Failed to fetch balance. Please try again later.' });
+  }
+};
 
-// Fetch balance from Solana network
+const sendTransaction = async (req, res) => {
+  const { senderAddress, recipientAddress, amount } = req.body;
+  
+  if (!senderAddress || !recipientAddress || !amount) {
+    return res.status(400).json({ error: 'Missing required parameters' });
+  }
 
-export { authenticateToken, signup, login, logout, checkBalance };
+  try {
+    const connection = new Connection(
+      'https://api.mainnet-beta.solana.com',
+      'confirmed'
+    );
+    
+    // Convert SOL to lamports
+    const lamports = amount * LAMPORTS_PER_SOL;
+    
+    // Create transaction
+    const transaction = new Transaction().add(
+      SystemProgram.transfer({
+        fromPubkey: new PublicKey(senderAddress),
+        toPubkey: new PublicKey(recipientAddress),
+        lamports,
+      })
+    );
+    
+    // Get recent blockhash
+    const { blockhash } = await connection.getRecentBlockhash();
+    transaction.recentBlockhash = blockhash;
+    
+    // Return the serialized transaction
+    const serializedTransaction = transaction.serialize({ requireAllSignatures: false });
+    
+    res.json({
+      transaction: serializedTransaction.toString('base64'),
+      message: 'Transaction created successfully'
+    });
+  } catch (error) {
+    console.error('Send transaction error:', error);
+    res.status(500).json({ error: 'Failed to create transaction' });
+  }
+};
+
+export { 
+  authenticateToken, 
+  signup, 
+  login, 
+  logout, 
+  checkBalance,
+  sendTransaction 
+};

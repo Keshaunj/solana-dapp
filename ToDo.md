@@ -16,7 +16,8 @@ The errors suggest there are a few issues to fix. The main problem is that the f
 
 First, you need to set up the correct API URL in your frontend. Add this to your vite.config.js:
 
-**----**   Work on this error tonight!!
+**----**   Work on this error tonight!!/MAKE A FETCH SERCE/PROXY FILE COMMUNICATING WITH BACKEND
+**------------------Move Check Balce Function to backend for security**
 ImportWallet.jsx:45 
             
            ImportWallet.jsx:45 

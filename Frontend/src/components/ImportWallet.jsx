@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Keypair } from '@solana/web3.js';
+import TransactionPanel from './TransactionPanel';
 
 const ImportWallet = () => {
   const [privateKey, setPrivateKey] = useState('');
@@ -8,8 +9,6 @@ const ImportWallet = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Remove network state since we're only using mainnet
-  
   const handleImportWallet = () => {
     try {
       if (!privateKey || privateKey.length !== 128) {
@@ -118,6 +117,9 @@ const ImportWallet = () => {
               <p className="text-sm">Network: Mainnet</p>
             </div>
           )}
+
+          {/* Transaction Panel - Only visible after importing wallet */}
+          <TransactionPanel walletAddress={walletAddress} />
 
           <button
             onClick={() => {
