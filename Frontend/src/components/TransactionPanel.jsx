@@ -10,7 +10,7 @@ const TransactionPanel = ({ walletAddress }) => {
   const handleSend = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    setError(''); 
     setSuccess('');
 
     try {
