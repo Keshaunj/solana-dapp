@@ -11,7 +11,8 @@ const ImportWallet = () => {
 
   const handleImportWallet = () => {
     try {
-      if (!privateKey || privateKey.length !== 128) {
+      // Validate the private key length and format
+      if (!privateKey || privateKey.length !== 128 || !/^[0-9a-fA-F]+$/.test(privateKey)) {
         setError('Invalid private key. It must be a 128-character hex string.');
         return;
       }
@@ -26,41 +27,35 @@ const ImportWallet = () => {
       setBalance(null);
     } catch (err) {
       setError('Failed to import wallet. Please check the private key and try again.');
-      console.error(err);
+      console.error('Import wallet error:', err); // More detailed error logging
     }
   };
 
   const checkBalance = async () => {
     if (!walletAddress) {
-      setError("Please import a wallet first.");
+      setError('No wallet address available.');
       return;
     }
-  
+
     setIsLoading(true);
-    setError(""); 
-    setBalance(null); 
-  
     try {
-      const response = await fetch('/auth/check-balance', {
-        method: 'POST',
+      const response = await fetch(`http://localhost:3000/api/check-balance/${walletAddress}`, {
+        method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`, // Include token for authorization
         },
-        body: JSON.stringify({
-          walletAddress: walletAddress
-        }),
       });
-  
+
       if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.error || "Error fetching balance. Please try again.");
-      } else {
-        const data = await response.json();
-        setBalance(data.balance);
+        throw new Error(`HTTP error! Status: ${response.status}`);
       }
+
+      const data = await response.json();
+      setBalance(data.balance);
+      setError('');
     } catch (error) {
-      console.error("Error checking balance:", error);
-      setError("Error fetching balance. Please try again.");
+      setError('Failed to fetch balance. Please try again later.');
+      console.error('Error checking balance:', error);
     } finally {
       setIsLoading(false);
     }

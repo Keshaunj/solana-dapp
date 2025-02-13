@@ -4,17 +4,25 @@ import Dashboard from './components/Dashboard';
 import SignIn from './components/Signin';
 import Signup from './components/Signup';
 
-
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
+  const [isAuthenticated, setIsAuthenticated] = useState(null); // Null to handle loading state
+  
   useEffect(() => {
-    // Check for authentication token on mount
     const token = localStorage.getItem('token');
-    if (token) {
-      setIsAuthenticated(true);
-    }
+    setIsAuthenticated(!!token);
   }, []);
+
+  const handleSignOut = () => {
+    localStorage.removeItem('token');
+    setIsAuthenticated(false);
+  };
+
+  const ProtectedRoute = ({ children }) => {
+    if (isAuthenticated === null) {
+      return <div className="text-center mt-10">Loading...</div>; // Show loading while checking auth
+    }
+    return isAuthenticated ? children : <Navigate to="/signin" />;
+  };
 
   const DashboardLayout = () => (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -22,10 +30,7 @@ function App() {
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold text-gray-800">Solana Wallet Dashboard</h1>
           <button 
-            onClick={() => {
-              localStorage.removeItem('token');
-              setIsAuthenticated(false);
-            }}
+            onClick={handleSignOut}
             className="px-4 py-2 text-sm text-purple-600 hover:text-purple-700"
           >
             Sign Out
@@ -41,39 +46,35 @@ function App() {
     </div>
   );
 
-  // Protected Route Component
-  const ProtectedRoute = ({ children }) => {
-    return isAuthenticated ? children : <Navigate to="/signin" />;
-  };
-
   return (
     <Router>
       <Routes>
-        {/* Public Routes */}
         <Route path="/signin" element={
-          !isAuthenticated ? (
+          isAuthenticated === false ? (
             <SignIn onSignInSuccess={() => setIsAuthenticated(true)} />
-          ) : (
-            <Navigate to="/dashboard" />
-          )
-        } />
-        
-        <Route path="/signup" element={
-          !isAuthenticated ? (
-            <Signup onSignupSuccess={() => setIsAuthenticated(true)} />
+          ) : isAuthenticated === null ? (
+            <div className="text-center mt-10">Loading...</div>
           ) : (
             <Navigate to="/dashboard" />
           )
         } />
 
-        {/* Protected Routes */}
+        <Route path="/signup" element={
+          isAuthenticated === false ? (
+            <Signup onSignupSuccess={() => setIsAuthenticated(true)} />
+          ) : isAuthenticated === null ? (
+            <div className="text-center mt-10">Loading...</div>
+          ) : (
+            <Navigate to="/dashboard" />
+          )
+        } />
+
         <Route path="/dashboard" element={
           <ProtectedRoute>
             <DashboardLayout />
           </ProtectedRoute>
         } />
 
-        {/* Default Route */}
         <Route path="/" element={<Navigate to="/signin" />} />
       </Routes>
     </Router>

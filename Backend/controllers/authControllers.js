@@ -86,22 +86,22 @@ const logout = (req, res) => {
 // Solana Wallet Functions
 const checkBalance = async (req, res) => {
   const { walletAddress } = req.body;
-    
+
   if (!walletAddress) {
     return res.status(400).json({ error: 'Wallet address is required.' });
   }
 
   try {
     const connection = new Connection(
-      'https://api.mainnet-beta.solana.com',
+      'https://solana-mainnet.g.alchemy.com/v2/ZRGjt_VbvGonUrn0e6_Ptc1gJofRtdD_',
       'confirmed'
     );
 
     const publicKey = new PublicKey(walletAddress);
     const balance = await connection.getBalance(publicKey);
     const balanceInSOL = balance / LAMPORTS_PER_SOL;
-      
-    return res.json({ 
+
+    return res.json({
       balance: Number(balanceInSOL.toFixed(4))
     });
   } catch (error) {
@@ -109,6 +109,7 @@ const checkBalance = async (req, res) => {
     return res.status(500).json({ error: 'Failed to fetch balance. Please try again later.' });
   }
 };
+
 
 const sendTransaction = async (req, res) => {
   const { senderAddress, recipientAddress, amount } = req.body;

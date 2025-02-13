@@ -1,81 +1,89 @@
-// src/components/SignIn.jsx
-import React, { useState } from 'react';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const SignIn = () => {
-  const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-  });
+const SignIn = ({ onSignInSuccess }) => {
+  const [username, setUsername] = useState(""); // Changed from email to username
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setError(""); // Reset error message
     try {
-      const response = await fetch('http://localhost:3000/login', {
-        method: 'POST',
+      const response = await fetch("http://localhost:3000/auth/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ username, password }), // Sending username instead of email
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        // Store the token and redirect to dashboard
-        localStorage.setItem('token', data.token);
-        window.location.href = '/dashboard';
+        localStorage.setItem("token", data.token);
+        if (onSignInSuccess) {
+          onSignInSuccess();
+        }
+        navigate("/dashboard");
       } else {
-        alert(data.message);
+        setError(data.message || "Invalid credentials");
       }
     } catch (error) {
-      alert('Error signing in');
+      setError("Error connecting to server. Please try again.");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full p-8 bg-white rounded-lg shadow-md">
-        <h2 className="text-center text-3xl font-bold mb-8">Sign In</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-12 rounded-xl shadow-2xl w-full max-w-2xl">
+        <h2 className="text-4xl font-extrabold text-center text-gray-800 mb-8">Sign In</h2>
+        
+        {error && <p className="text-red-500 text-lg text-center mb-6">{error}</p>}
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-gray-700">Username</label>
+            <label className="block text-lg text-gray-700 font-semibold">Username</label>
             <input
               type="text"
-              value={formData.username}
-              onChange={(e) => setFormData({...formData, username: e.target.value})}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500"
+              placeholder="Enter your username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
+              className="w-full px-5 py-3 text-lg border rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-500"
             />
           </div>
-
+          
           <div>
-            <label className="block text-gray-700">Password</label>
+            <label className="block text-lg text-gray-700 font-semibold">Password</label>
             <input
               type="password"
-              value={formData.password}
-              onChange={(e) => setFormData({...formData, password: e.target.value})}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
+              className="w-full px-5 py-3 text-lg border rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-500"
             />
           </div>
-
+          
           <button
             type="submit"
-            className="w-full py-2 px-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+            className="w-full bg-purple-600 text-white py-3 text-lg rounded-xl hover:bg-purple-700 transition"
           >
             Sign In
           </button>
         </form>
-
-        <div className="mt-4 text-center">
-          <p className="text-gray-600">
-            Don't have an account?{' '}
-            <a href="/signup" className="text-purple-600 hover:text-purple-700">
-              Create one
-            </a>
-          </p>
-        </div>
+        
+        <p className="text-lg text-gray-600 mt-6 text-center">
+          Don't have an account?{" "}
+          <button
+            onClick={() => navigate("/signup")}
+            className="text-purple-600 font-semibold hover:underline"
+          >
+            Sign Up
+          </button>
+        </p>
       </div>
     </div>
   );

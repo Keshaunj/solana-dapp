@@ -41,7 +41,6 @@
     "@vitejs/plugin-react": "^4.2.1",
     "assert": "^2.1.0",
     "autoprefixer": "^10.4.20",
-    "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.1",
     "eslint": "^9.17.0",
     "eslint-plugin-react": "^7.37.2",
