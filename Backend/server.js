@@ -6,6 +6,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import { Connection, PublicKey } from '@solana/web3.js'; // Import Solana Web3.js
 import authRoutes from "./routes/authRoutes.js";
+import cookieParser from 'cookie-parser';
 
 // Load environment variables
 dotenv.config();
@@ -30,6 +31,7 @@ app.options('*', cors()); // Enable OPTIONS preflight handling
 app.use(express.json());
 app.use(helmet()); // Set security headers
 app.use(morgan("dev")); // Log HTTP requests
+app.use(cookieParser());
 
 // MongoDB connection
 const mongoURI = process.env.MONGODB_URI;
@@ -80,6 +82,11 @@ app.use((err, req, res, next) => {
 app.get("/test-cors", (req, res) => {
   res.send("CORS is working!");
 });
+
+app.use('/api', authRoutes);
+
+console.log(authRoutes.stack.map(r => r.route && r.route.path));
+
 
 // Start the server
 const PORT = process.env.PORT || 3000;

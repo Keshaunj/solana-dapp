@@ -61,6 +61,40 @@ const ImportWallet = () => {
     }
   };
 
+  const sendSolana = async (recipientAddress, amount) => {
+    const token = localStorage.getItem('token');  // Get JWT token from localStorage
+    const senderPrivateKey = privateKey; // Use the imported private key
+
+    try {
+      const response = await fetch('http://localhost:3000/auth/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,  // Include JWT token for authentication
+        },
+        body: JSON.stringify({
+          senderPrivateKey: JSON.stringify([...(senderPrivateKey.match(/.{1,2}/g) || []).map((byte) => parseInt(byte, 16))]), // Convert private key string to array of bytes
+          recipientAddress,
+          amount,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        console.log('Transaction success:', data);
+      } else {
+        console.error('Transaction failed:', data.message || data.error);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4">
       {error && (
@@ -89,7 +123,7 @@ const ImportWallet = () => {
           </button>
         </div>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
           <p className="text-gray-700">
             Wallet Address: {walletAddress}
           </p>
@@ -116,13 +150,16 @@ const ImportWallet = () => {
           {/* Transaction Panel - Only visible after importing wallet */}
           <TransactionPanel walletAddress={walletAddress} />
 
+        
+
+          {/* Delete Wallet button styled in red */}
           <button
             onClick={() => {
               setWalletAddress(null);
               setBalance(null);
               setPrivateKey('');
             }}
-            className="w-full py-2 px-4 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+            className="w-full py-2 px-4 bg-red-500 text-white rounded-lg hover:bg-red-700"
           >
             Delete Wallet
           </button>

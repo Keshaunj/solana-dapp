@@ -131,24 +131,9 @@ const WalletGenerator = () => {
          </div>
 
          <div className="space-y-1">
-           <button
-             onClick={checkBalance}
-             className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
-           >
-             Check Balance
-           </button>
+      
            
-           <button
-             onClick={requestAirdrop}
-             disabled={isAirdropLoading}
-             className={`w-full py-2 px-4 rounded ${
-               isAirdropLoading 
-                 ? 'bg-gray-400 cursor-not-allowed' 
-                 : 'bg-green-600 hover:bg-green-700'
-             } text-white`}
-           >
-             {isAirdropLoading ? 'Requesting...' : 'Request 1 SOL (Devnet)'}
-           </button>
+         
 
            {balance !== null && (
              <p className="text-center text-gray-600">
@@ -156,18 +141,7 @@ const WalletGenerator = () => {
              </p>
            )}
 
-           <div className="text-xs text-gray-500 text-center mt-2">
-             Note: If airdrop fails, visit{' '}
-             <a 
-               href="https://faucet.solana.com" 
-               target="_blank" 
-               rel="noopener noreferrer"
-               className="text-purple-600 hover:text-purple-700 underline"
-             >
-               Solana Faucet
-             </a>
-             {' '}for test SOL
-           </div>
+          
          </div>
        </div>
      )}

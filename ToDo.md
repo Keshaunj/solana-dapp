@@ -50,5 +50,9 @@ Tkae away this error if you get it Error fetching balance. Please try again. Aft
 ------------Also----------
  amke sure users wallets and profile info are saved to there profile not just a new profile with refresh everytrhing make a tab or profile wit hwallet eother already imported afyter they log back in instead of  them import there pre exsting wallets!
 
+**--Feb 13th--**
+- Make send solana button work
+- Make user imported wallets & or generated wallets save to the user
+- Make when wallets dlete that it also deltes out of db
 
 

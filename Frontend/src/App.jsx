@@ -25,10 +25,10 @@ function App() {
   };
 
   const DashboardLayout = () => (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <header className="mb-8">
+    <div className="min-h-screen bg-gray-50 p-7">
+      <header className="mb-2">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-800">Solana Wallet Dashboard</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Solana Wallet Dashboard</h1>
           <button 
             onClick={handleSignOut}
             className="px-4 py-2 text-sm text-purple-600 hover:text-purple-700"

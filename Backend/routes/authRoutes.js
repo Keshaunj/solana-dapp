@@ -1,5 +1,5 @@
 import express from "express";
-import { signup, login, logout, authenticateToken, checkBalance, sendTransaction } from "../controllers/authControllers.js";
+import { signup, login, logout, authenticateToken, checkBalance, sendTransaction, getTransactions } from "../controllers/authControllers.js";
 
 const router = express.Router();
 
@@ -11,5 +11,8 @@ router.get("/dashboard", authenticateToken, (req, res) => {
   res.json({ message: `Welcome to your dashboard, ${req.user.username}!` });
 });
 router.post('/check-balance',authenticateToken, checkBalance);
-router.post('/send-transaction',authenticateToken,sendTransaction)
+router.post('/send',authenticateToken,sendTransaction)
+router.get('/transactions/:address', authenticateToken, getTransactions);
+router.get('/balance/:address', authenticateToken, checkBalance);
+
 export default router;
