@@ -1,7 +1,7 @@
-# Project Plan: Solana dApp with React Frontend and Flask Backend
+# Project Plan: Solana dApp with React Frontend and Express Backend
 
 ## Project Overview
-This project involves creating a decentralized application (dApp) that allows users to send and receive tokens on the Solana blockchain. The application will have a **React** frontend and a **Flask** backend. Both components will be in the same repository and will be designed to communicate seamlessly.
+This project involves creating a decentralized application (dApp) that allows users to send and receive tokens on the Solana blockchain. The application will have a **React** frontend and an **Express.js** backend. Both components will be in the same repository and will be designed to communicate seamlessly.
 
 ---
 
@@ -34,28 +34,32 @@ This project involves creating a decentralized application (dApp) that allows us
    - Notify users of transaction success or failure.
 
 3. **User Authentication**:
-   - Optional backend authentication for user session management.
+   - Backend authentication with JWT for session management.
 
 4. **UI Enhancements**:
    - Add animations and responsive design for a better user experience.
-5. Input Search  
-- As a user, I want the ability to **search for other tokens**.  
-- As a user, I want to see **price changes for Solana and other tokens**.  
+
+5. **Input Search**  
+   - As a user, I want the ability to **creat a Solana Wallet**.  
+   - As a user, I want to see **price changes for Solana and other tokens**.  
+
 ---
 
 ## Technical Stack
 
 ### Frontend
 - **Framework**: React (with Vite for setup)
-- **UI Library**: Tailwind CSS or Material UI
+- **UI Library**: Tailwind CSS
 - **Solana Integration**: Solana Web3.js library
 - **State Management**: React Context API or Redux
 
 ### Backend
-- **Framework**: Flask
-- **Database**: SQLite (for logging transactions or optional user data)
-- **API Interaction**: Flask REST API
-- **Blockchain Integration**: Solana’s Python SDK or RPC calls
+- **Framework**: Express.js
+- **Database**: MongoDB
+- **Authentication**: JWT (JSON Web Tokens)
+- **API Interaction**: REST APIs
+- **Blockchain Integration**: Solana’s Web3.js or RPC calls
+- **Middleware**: CORS, Morgan
 
 ---
 
@@ -63,39 +67,89 @@ This project involves creating a decentralized application (dApp) that allows us
 
 ```
 project-root/
-├── backend/      # Flask backend files
-│   └── app.py
-│   └── requirements.txt
+├── backend/      # Express backend files
+│   └── controllers/
+│   └── models/
+│   └── routes/
+│   └── server.js
+│   └── .env
+│   └── package.json
 ├── frontend/     # React frontend files
 │   └── src/
 │       └── components/
 │       └── App.jsx
 │   └── package.json
 |    
-└── README.md , .env , gitignore
+└── README.md , .gitignore
+```
+
+---
+
+## Routes
+
+```javascript
+import express from "express";
+import {
+  signup,
+  login,
+  logout,
+  authenticateToken,
+  checkBalance,
+  sendTransaction,
+  getTransactions,
+  updateProfile,
+  deleteProfile,
+  getUserProfile,
+  verifyToken,
+  getTransactionHistory,
+  deleteTransaction
+} from "../controllers/authControllers.js";
+
+const router = express.Router();
+
+router.post("/signup", signup);
+router.post("/login", login);
+router.post("/logout", logout);
+
+router.get("/dashboard", authenticateToken, (req, res) => {
+  res.json({ message: `Welcome to your dashboard, ${req.user.username}!` });
+});
+
+router.post('/check-balance', authenticateToken, checkBalance);
+router.post('/send', authenticateToken, sendTransaction);
+router.get('/transactions/:address', authenticateToken, getTransactions);
+router.get('/balance/:address', authenticateToken, checkBalance);
+router.get('/transactions', getTransactionHistory);
+router.delete('/transaction/:id', deleteTransaction);
+
+router.get("/profile", authenticateToken, getUserProfile);
+router.delete('/profile', authenticateToken, deleteProfile);
+router.get('/user/:id', verifyToken, getUserProfile);
+router.patch('/profile', authenticateToken, updateProfile);
+
+export default router;
 ```
 
 ---
 
 ## Communication Between Frontend and Backend
-1. **API Endpoints in Flask**:
-   - `POST /send`: Handles sending tokens.
-   - `GET /balance`: Fetches wallet balance.
-   - `POST /profiles`: Creates a new user profile.
-   - `GET /profiles/<id>`: Retrieves a specific user profile.
-   - `PUT /profiles/<id>`: Updates a specific user profile.
-   - `DELETE /profiles/<id>`: Deletes a specific user profile.
-   - `GET /transactions`: Retrieves all transaction logs.
-   - `POST /transactions`: Creates a new transaction log.
-   - `PUT /transactions/<id>`: Updates a specific transaction log.
-   - `DELETE /transactions/<id>`: Deletes a specific transaction log.
+1. **API Endpoints in Express**:
+   - `POST /signup`: User registration.
+   - `POST /login`: User login.
+   - `POST /logout`: User logout.
+   - `POST /check-balance`: Fetch wallet balance.
+   - `POST /send`: Send tokens.
+   - `GET /transactions/:address`: Get transaction history.
+   - `GET /profile`: Get user profile.
+   - `PATCH /profile`: Update user profile.
+   - `DELETE /profile`: Delete user profile.
 
 2. **HTTP Requests in React**:
-   - Use `axios` or `fetch` to interact with the Flask backend.
+   - Use `fetch` to interact with the Express backend.
    - Set up environment variables for the backend URL.
 
 3. **CORS**:
-   - Since both the frontend and backend will be in the same repository and served together, CORS won’t be required. However, it can be added for flexibility during development.
+   - Enable CORS middleware in Express to allow frontend-backend communication.
 
 ---
 
@@ -103,13 +157,13 @@ project-root/
 
 ### Phase 1: Setup and Environment
 - Initialize the repository and folder structure.
-- Set up Flask backend with a simple `app.py`.
+- Set up Express backend with a simple `server.js`.
 - Create a React app using Vite.
 
 ### Phase 2: Backend Development
-- Implement the Flask routes for sending tokens and checking balances.
+- Implement Express routes for user authentication and transaction handling.
 - Implement CRUD operations for user profiles and transaction logs.
-- Integrate Solana’s Python SDK for blockchain interaction.
+- Integrate Solana’s Web3.js for blockchain interaction.
 - Test API endpoints using Postman or Curl.
 
 ### Phase 3: Frontend Development
@@ -119,10 +173,10 @@ project-root/
   - Send token form
   - Balance display
   - CRUD interfaces for user profiles and transaction logs
-- Integrate the frontend with Flask API endpoints.
+- Integrate the frontend with Express API endpoints.
 
 ### Phase 4: Integration
-- Serve the React app through Flask for a unified deployment.
+- Serve the React app through Express for a unified deployment.
 - Test the end-to-end flow: wallet connection, token sending, CRUD operations, and balance checking.
 
 ### Phase 5: Final Touches
@@ -131,44 +185,13 @@ project-root/
 - Optional: Add stretch goal features.
 
 ---
-# User Stories  
-
-## Authentication  
-- As a user, I want to **sign up or log in** to my account so I can access my Solana wallet profile securely.  
-- As a returning user, I want to **log in quickly** and be directed to my personalized Solana wallet dashboard.  
-
-## Wallet Management  
-- As a user, I want to **create or import a Solana wallet** to manage my funds within the dApp.  
-- As a user, I want my wallet data to be **securely stored and accessible in the database**.  
-
-## Buy Solana  
-- As a user, I want to be directed to a **trusted third-party platform** (e.g., Phantom or Solflare) to buy Solana tokens.  
-
-## Sell Solana  
-- As a user, I want to **sell Solana directly** from my wallet and see the transaction logged in my profile.  
-
-## Send Solana  
-- As a user, I want to **send Solana** to another wallet by entering the recipient's wallet address.  
-- As a user, I want my **sent transactions to be stored and viewable** in my profile.  
-
-## Receive Solana  
-- As a user, I want to **receive Solana** by sharing my wallet address and have the incoming transactions reflected in my account balance.  
-
-## User Profile  
-- As a user, I want my **Solana wallet profile and transaction history** to be stored in a secure PostgreSQL database so that I can access my data at any time.  
-- As a user, I want to be able to **view my transaction logs** for Buy, Sell, Send, and Receive actions.  
-
-## Input Search  
-- As a user, I want the ability to **search for other tokens**.  
-- As a user, I want to see **price changes for Solana and other tokens**.  
-
 
 ## Deployment Plan
 1. **Backend**:
-   - Deploy Flask backend using services like Heroku, Vercel, or Render.
+   - Deploy Express backend using services like Heroku, Vercel, or Render.
 
 2. **Frontend**:
-   - Bundle the React app and serve it through Flask’s static folder.
+   - Bundle the React app and serve it through Express static files.
 
 3. **Domain**:
    - Optionally set up a custom domain for the dApp.
@@ -190,11 +213,7 @@ project-root/
 ## Resources
 - **Solana Documentation**: https://docs.solana.com/
 - **Solana Web3.js**: https://solana-labs.github.io/solana-web3.js/
-- **Flask Documentation**: https://flask.palletsprojects.com/
+- **Express Documentation**: https://expressjs.com/
 - **React Documentation**: https://reactjs.org/
 - **Vite Documentation**: https://vitejs.dev/
-
----
-
-
 

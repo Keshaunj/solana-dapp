@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import WalletGenerator from "./WalletGenerator";
 import ImportWallet from "./ImportWallet";
-import { checkBalanceAPI } from '../utils/api';
+
 
 const Dashboard = () => {
   const [walletAddress, setWalletAddress] = useState(null);

@@ -1,19 +1,18 @@
-// src/components/WalletGenerator.jsx
-import React, { useState } from "react";
+import { useState } from "react";
 import { Keypair, Connection, LAMPORTS_PER_SOL, clusterApiUrl, PublicKey } from "@solana/web3.js";
 
 const WalletGenerator = () => {
  const [wallet, setWallet] = useState(null);
  const [showPrivateKey, setShowPrivateKey] = useState(false);
  const [balance, setBalance] = useState(null);
- const [isAirdropLoading, setIsAirdropLoading] = useState(false);
+
 
  const generateNewWallet = () => {
    try {
-     console.log("Starting wallet generation...");
+    
      const newWallet = Keypair.generate();
      
-     // Convert secretKey to hex string
+    
      const privateKeyHex = Array.from(newWallet.secretKey)
        .map(byte => byte.toString(16).padStart(2, '0'))
        .join('');
@@ -34,17 +33,17 @@ const WalletGenerator = () => {
   
   try {
       const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
-      // Convert string public key to PublicKey object
+     
       const publicKey = new PublicKey(wallet.publicKey);
-      console.log("Checking balance for wallet:", publicKey.toString());
+     
 
       const balanceInLamports = await connection.getBalance(publicKey);
       const balanceInSOL = balanceInLamports / LAMPORTS_PER_SOL;
       
       setBalance(balanceInSOL);
-      console.log("Balance:", balanceInSOL, "SOL");
+    
   } catch (error) {
-      console.error("Balance check error:", error);
+     
       alert("Error checking balance. Please try again.");
   }
 };
@@ -57,14 +56,14 @@ const WalletGenerator = () => {
      const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
      const publicKey = new PublicKey(wallet.publicKey);
      
-     console.log("Requesting airdrop for:", publicKey.toString());
+   
      
      const airdropSignature = await connection.requestAirdrop(
        publicKey,
        LAMPORTS_PER_SOL
      );
      
-     console.log("Airdrop requested, signature:", airdropSignature);
+    
 
      const latestBlockHash = await connection.getLatestBlockhash();
      
@@ -74,12 +73,12 @@ const WalletGenerator = () => {
        signature: airdropSignature,
      });
 
-     console.log("Airdrop confirmed");
+    
      
      await checkBalance();
      alert("1 SOL airdropped successfully!");
    } catch (error) {
-     console.error("Detailed airdrop error:", error);
+   
      
      if (error.message.includes("429")) {
        const faucetUrl = "https://faucet.solana.com";
@@ -98,7 +97,8 @@ const WalletGenerator = () => {
    <div className="p-4 bg-white rounded-lg shadow">
      <div>
        <p className="text-gray-600 mb-4">
-         Create your Solana wallet on Devnet for testing
+       Create your Solana wallet in seconds and start exploring the power of Web3 securely on our platform!
+       Always store your private keys securely—if you lose them, you lose access to your wallet forever!
        </p>
        <button 
          onClick={generateNewWallet}

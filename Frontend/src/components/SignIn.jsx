@@ -1,32 +1,50 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useUser } from '../context/UserContext';
 
-const SignIn = ({ onSignInSuccess }) => {
-  const [username, setUsername] = useState(""); // Changed from email to username
+const SignIn = () => {
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const navigate = useNavigate();
+  const { updateUser } = useUser();
+
+
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      window.location.href = '/dashboard';
+    }
+  }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setError(""); // Reset error message
+    setError("");
+
+    if (!username || !password) {
+      setError("Please fill in all fields");
+      return;
+    }
+
     try {
       const response = await fetch("http://localhost:3000/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password }), // Sending username instead of email
+        body: JSON.stringify({ username, password }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem("token", data.token);
-        if (onSignInSuccess) {
-          onSignInSuccess();
-        }
-        navigate("/dashboard");
+        localStorage.setItem("authToken", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        updateUser(data.user);
+        
+       
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 100);
       } else {
         setError(data.message || "Invalid credentials");
       }
@@ -36,9 +54,23 @@ const SignIn = ({ onSignInSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-12 rounded-xl shadow-2xl w-full max-w-2xl">
-        <h2 className="text-4xl font-extrabold text-center text-gray-800 mb-8">Sign In</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div className="text-center">
+          <h2 
+            className="mt-6 text-center text-4xl"
+            style={{ 
+              fontFamily: '"Bungee Spice", serif',
+              fontWeight: 400,
+              fontStyle: 'normal'
+            }}
+          >
+            Flash Firm Decentralized Finance (DeFi)
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Non-Custodial Blockchain Solution
+          </p>
+        </div>
         
         {error && <p className="text-red-500 text-lg text-center mb-6">{error}</p>}
         
@@ -77,12 +109,12 @@ const SignIn = ({ onSignInSuccess }) => {
         
         <p className="text-lg text-gray-600 mt-6 text-center">
           Don't have an account?{" "}
-          <button
-            onClick={() => navigate("/signup")}
+          <Link
+            to="/signup"
             className="text-purple-600 font-semibold hover:underline"
           >
             Sign Up
-          </button>
+          </Link>
         </p>
       </div>
     </div>
