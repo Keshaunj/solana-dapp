@@ -29,8 +29,16 @@ This is the **backend** for **Flash Firm DEX**, a **non-custodial Solana wallet*
 
 ### **1. Clone the Repository**
 ```bash
-git clone 
-cd solana_dappbackend
+git clone https://github.com/Keshaunj/solana-dapp/tree/main/Backend
+cd solana_dapp/backend
+```
+
+### **2. Install Dependencies**
+```bash
+npm install
+```
+
+
 API Endpoints
 
 Authentication

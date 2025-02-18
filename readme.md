@@ -68,8 +68,8 @@ Ensure you have **Node.js** and **npm** installed.
 
 ### Clone the Repository
 ```bash
-git clone https://github.com/yourusername/flash-firm-dex.git
-cd flash-firm-dex/frontend
+git clone https://github.com/Keshaunj/solana-dapp.git
+cd solana_dapp/frontend
 ```
 
 ### Install Dependencies
