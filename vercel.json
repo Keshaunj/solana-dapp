@@ -4,13 +4,24 @@
       {
         "src": "frontend/package.json",
         "use": "@vercel/static-build"
+      },
+      {
+        "src": "backend/index.js", 
+        "use": "@vercel/node"
       }
     ],
     "routes": [
+      {
+        "src": "/auth/(.*)",
+        "dest": "/backend/index.js"
+      },
+      {
+        "src": "/api/(.*)",
+        "dest": "/backend/index.js"
+      },
       {
         "src": "/(.*)",
         "dest": "/frontend/$1"
       }
     ]
   }
-  
